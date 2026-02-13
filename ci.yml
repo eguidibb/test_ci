@@ -1,30 +1,74 @@
-name: Python CI
+# ========================================
+# EXEMPLE 4 : MULTI-OS (Multi-Plateformes)
+# ========================================
+# Ce workflow teste votre code sur PLUSIEURS
+# systèmes d'exploitation en même temps
+
+name: 04 - Multi OS
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
-  build:
+  # ================
+  # Test sur Ubuntu (Linux)
+  # ================
+  test-ubuntu:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Récupérer le code
-      uses: actions/checkout@v3
+      - name: Test sur Ubuntu
+        run: |
+          echo "🐧 Test sur Linux Ubuntu"
+          echo "Système : $(uname -s)"
+          echo "Version : $(uname -r)"
 
-    - name: Installer Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.10"
+  # ================
+  # Test sur Windows
+  # ================
+  test-windows:
+    runs-on: windows-latest
 
-    - name: Installer les dépendances
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+    steps:
+      - name: Test sur Windows
+        # Sur Windows, on utilise PowerShell
+        run: |
+          echo "🪟 Test sur Windows"
+          echo "Système : $env:OS"
 
-    - name: Lancer les tests
-      run: |
-        pytest
+  # ================
+  # Test sur MacOS
+  # ================
+  test-macos:
+    runs-on: macos-latest
 
+    steps:
+      - name: Test sur MacOS
+        run: |
+          echo "🍎 Test sur MacOS"
+          echo "Système : $(uname -s)"
+
+  # ================
+  # MÉTHODE AVANCÉE : Matrix Strategy
+  # ================
+  # Cette méthode permet de tester sur plusieurs OS
+  # avec un seul job (plus efficace !)
+  test-matrix:
+    # Définir une matrice de systèmes d'exploitation
+    strategy:
+      matrix:
+        # Liste des OS à tester
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    # Utiliser la variable de la matrice
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Test sur ${{ matrix.os }}
+        run: |
+          echo "🔧 Test sur ${{ matrix.os }}"
+          echo "Ceci s'exécute sur chaque OS !"
+
+# ASTUCE : La matrix strategy est plus efficace et facile à maintenir !
